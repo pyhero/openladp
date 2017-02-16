@@ -1,0 +1,2 @@
+# openladp
+openldap init
