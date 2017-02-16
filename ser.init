@@ -1,0 +1,58 @@
+#!/bin/bash
+#
+# Author: Panda
+# Update: 20160616
+#
+
+DIR=$(cd `dirname $0` && /bin/pwd)
+script_dir="$DIR/xscripts"
+
+funcs="$script_dir/functions"
+if [ ! -f $funcs ];then
+	echo -e "\e[32m$funcs\e[0m: not exist."
+	exit 6
+else
+	source $funcs
+fi
+
+##. Get Domain Name
+file=$script_dir/getDomain.sh
+chkfile
+source $file
+
+##. install sortware
+yum -y -q install openldap openldap-clients openldap-servers
+
+##. Generate root password
+file=$script_dir/setPassword.sh
+chkfile
+source $file
+
+##. stored infomation.
+info_file=$config_dir/ldap.info
+cat > $info_file << EOF
+DOMAIN_NAME="$DOMAIN_NAME"
+DN="$DN"
+ROOT_DN="$ROOT_DN"
+password="$password"
+DC_NAME="$DC_NAME"
+HOSTNAME_FQDN="$HOSTNAME_FQDN"
+EOF
+
+##. Generate certs
+file=$script_dir/generateCerts.sh
+chkfile
+source $file
+
+##. Generate slapd.conf
+file=$script_dir/slapd.sh
+chkfile
+source $file
+
+##. Modify ldap.conf
+LDAP_CLIENT_CONF="/etc/openldap/ldap.conf"
+if ! grep -q "^BASE" $LDAP_CLIENT_CONF;then
+	cat >> $LDAP_CLIENT_CONF << EOF
+BASE	$DN
+EOF
+fi

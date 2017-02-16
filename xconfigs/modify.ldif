@@ -1,0 +1,4 @@
+dn: cn=xujianhua,ou=Accounts,dc=noc,dc=aiuv,dc=com
+changetype: modify
+replace: allowsvn
+allowsvn: TRUE

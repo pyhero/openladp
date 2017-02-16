@@ -1,0 +1,69 @@
+dn: dc=noc,dc=aiuv,dc=com
+dc: noc
+o: noc
+objectclass: dcObject
+objectclass: organization
+objectclass: top
+
+dn: ou=Accounts,dc=noc,dc=aiuv,dc=com
+ou: Accounts
+objectclass: organizationalUnit
+objectclass: top
+
+dn: ou=Groups,dc=noc,dc=aiuv,dc=com
+ou: Groups
+objectclass: organizationalUnit
+objectclass: top
+
+dn: cn=SUPER,ou=Groups,dc=noc,dc=aiuv,dc=com
+cn: SUPER
+objectclass: posixGroup
+gidNumber: 7000
+description: super root 
+
+dn: cn=COMMON,ou=Groups,dc=noc,dc=aiuv,dc=com
+cn: COMMON
+objectclass: posixGroup
+gidNumber: 7001
+description: Default group
+memberUid: panda
+
+dn: cn=SA,ou=Groups,dc=noc,dc=aiuv,dc=com
+cn: SA
+objectclass: posixGroup
+gidNumber: 7002
+description: System Administrator
+
+dn: cn=DEV,ou=Groups,dc=noc,dc=aiuv,dc=com
+cn: DEV
+objectclass: posixGroup
+gidNumber: 7003
+description: developer
+
+dn: cn=DBA,ou=Groups,dc=noc,dc=aiuv,dc=com
+cn: DBA
+objectclass: posixGroup
+gidNumber: 7004
+description: db administrator
+
+dn: cn=panda,ou=Accounts,dc=noc,dc=aiuv,dc=com
+cn: panda
+sn: panda
+uid: panda
+userPassword: {SSHA}VC5y5VU1zw3Y5VcV0W3QiHE/1izKJ3Zb
+objectclass: iNetOrgPerson
+objectclass: posixAccount
+objectClass: shadowAccount
+objectClass: smartAccount
+uidNumber: 7000
+gidNumber: 7000
+loginShell: /bin/bash
+homeDirectory: /home/panda
+gecos: panda
+mail: panda@aiuv.cc
+mobile: 15910667955
+isvalid: TRUE
+allowssh: TRUE
+allowsvn: TRUE
+allowgit: TRUE
+allowvpn: TRUE

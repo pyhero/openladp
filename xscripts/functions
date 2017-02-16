@@ -1,0 +1,49 @@
+#!/bin/bash
+#
+
+chkdir () {
+	# Need to define var: dir
+	if [ ! -d $dir ];then
+		echo "$dir:not exist!"
+		exit 1
+	fi
+}
+
+chkfile () {
+	# Need to define var: file
+	if [ ! -f $file ];then
+		echo "$file:not exist!"
+		exit 1
+	fi
+}
+
+DIR=$(cd `dirname $0`;echo $PWD)
+script_dir=$DIR/xscripts
+config_dir=$DIR/xconfigs
+log_dir=$DIR/xlogs
+
+for dir in $script_dir $config_dir $log_dir;do
+	chkdir
+done
+
+TODAY=$($(which date) "+%Y%m%d")
+
+chkping () {
+	# Need to modify var: ip
+	if ! $(which ping) -c 1 -q $ip > /dev/null;then
+		echo $ip >> $failed_list
+		echo -e "\e[31m$ip\e[0m:      ip address unreachable.\n \
+		Check if \e[31m$ip\e[0m is valid or network is reachable."
+		notify_failed
+		help
+	fi
+}
+
+notify_failed () {
+	if [ -s $failed_list ];then
+		title="! funcs warning !"
+		body="FYI"
+		mail="panda@aiuv.cc"
+		source $script_dir/mail.sh
+	fi
+}

@@ -1,0 +1,83 @@
+#!/bin/bash
+#
+
+if [ ! -z $info_file ];then
+	info_src=$info_file
+else
+	info_src=../xconfigs/ldap.info
+fi
+source $info_src
+[ $? -ne 0 ] && exit 2
+
+ldaptree=tree.ldif
+cat > $ldaptree << EOF
+dn: $DN
+dc: $DC_NAME
+o: $DC_NAME
+objectclass: dcObject
+objectclass: organization
+objectclass: top
+
+dn: ou=Accounts,$DN
+ou: Accounts
+objectclass: organizationalUnit
+objectclass: top
+
+dn: ou=Groups,$DN
+ou: Groups
+objectclass: organizationalUnit
+objectclass: top
+
+dn: cn=SUPER,ou=Groups,$DN
+cn: SUPER
+objectclass: posixGroup
+gidNumber: 7000
+description: Super root 
+
+dn: cn=COMMON,ou=Groups,$DN
+cn: COMMON
+objectclass: posixGroup
+gidNumber: 7001
+description: Default group
+memberUid: panda
+
+dn: cn=SA,ou=Groups,$DN
+cn: SA
+objectclass: posixGroup
+gidNumber: 7002
+description: System Administrator
+
+dn: cn=DEV,ou=Groups,$DN
+cn: DEV
+objectclass: posixGroup
+gidNumber: 7003
+description: Developer
+
+dn: cn=DBA,ou=Groups,$DN
+cn: DBA
+objectclass: posixGroup
+gidNumber: 7004
+description: DB Administrator
+
+dn: cn=panda,ou=Accounts,$DN
+cn: panda
+sn: panda
+uid: panda
+userPassword: {SSHA}VC5y5VU1zw3Y5VcV0W3QiHE/1izKJ3Zb
+objectclass: iNetOrgPerson
+objectclass: posixAccount
+objectClass: shadowAccount
+objectClass: smartAccount
+uidNumber: 7000
+gidNumber: 7000
+loginShell: /bin/bash
+homeDirectory: /home/panda
+gecos: panda
+mail: panda@aiuv.cc
+mobile: 15910667955
+isvalid: TRUE
+allowssh: TRUE
+allowsvn: TRUE
+allowgit: TRUE
+allowvpn: TRUE
+EOF

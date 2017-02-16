@@ -1,0 +1,6 @@
+DOMAIN_NAME="noc.aiuv.com"
+DN="dc=noc,dc=aiuv,dc=com"
+ROOT_DN="cn=root,dc=noc,dc=aiuv,dc=com"
+password="{SSHA}8JAE5hDkndeR38dWqsGxaslEYcgA/WVt"
+DC_NAME="noc"
+HOSTNAME_FQDN="ldap.noc.aiuv.com"

@@ -1,0 +1,72 @@
+#!/bin/bash
+#
+# Author: Xu Panda
+# Update: 20160617
+
+#ldapurl="ldaps://ldap.noc.aiuv.com"
+ldapurl="ldap://ldap.noc.aiuv.com"
+DN="dc=noc,dc=aiuv,dc=com"
+DIR=$(cd `dirname $0` && /bin/pwd)
+TODAY=$($(which date) "+%Y%m%d")
+
+##. install sortware
+yum install -y -q openldap-clients sssd > /dev/null
+
+##. get ca.crt
+#CA_SRC="http://tools.noc.aiuvinc.com/openldap/ca.crt"
+#CA_DIR=/etc/openldap/certs
+#CA=$CA_DIR/ca.crt
+#cd $CA_DIR
+#[ -f $CA ] && mv $CA ${CA}.${TODAY}
+#wget $CA_SRC
+#chmod 660 $CA
+
+##. modify sssd
+cat > /etc/sssd/sssd.conf << EOF
+[sssd]
+config_file_version = 2
+services = nss, pam, autofs
+domains = ldap
+
+[nss]
+filter_users = root,ldap,named,avahi,haldaemon,dbus,radiusd,news,nscd
+
+[pam]
+
+[domain/ldap]
+debug_level = 3
+id_provider = ldap
+auth_provider = ldap
+chpass_provider = ldap
+cache_credentials = true
+ldap_uri = $ldapurl
+ldap_search_base = $DN
+ldap_schema = rfc2307
+ldap_id_use_start_tls = false
+ldap_group_member = memberUid
+ldap_network_timeout = 5
+entry_cache_timeout = 60
+ldap_user_search_filter = (|(&(isvalid=TRUE)(allowssh=TRUE)(loginShell=/bin/bash))(&(isvalid=TRUE)(gidNumber=7001)(loginShell=/bin/bash)))
+EOF
+chmod 600 /etc/sssd/sssd.conf
+authconfig --enablesssd --enablesssdauth --enableldap --enableldapauth --enablelocauthorize --enablemkhomedir --update --ldapserver="$ldapurl" --ldapbasedn="$DN"
+
+##. modify visudo
+if ! grep -q SUPER /etc/sudoers;then
+cat >> /etc/sudoers << EOF
+%SUPER ALL=(ALL) NOPASSWD: /usr/bin/sudo, /bin/su -
+EOF
+fi
+
+##. autostart
+chkconfig sssd on
+/etc/init.d/sssd restart > /dev/null
+#chkconfig nscd on
+
+##. Modify ldap.conf
+LDAP_CLIENT_CONF="/etc/openldap/ldap.conf"
+if ! grep -q "^BASE" $LDAP_CLIENT_CONF;then
+	cat >> $LDAP_CLIENT_CONF << EOF
+BASE	$DN
+EOF
+fi

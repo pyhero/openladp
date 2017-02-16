@@ -1,0 +1,2 @@
+openssl s_client -connect ldap.noc.aiuv.com:636
+ldapsearch -x -ZZ -d1 -H ldap://ldap.noc.aiuv.com
